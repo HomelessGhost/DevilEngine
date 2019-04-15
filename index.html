@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Devil Engine</title>
+</head>
+<body>
+
+    <div>
+        <canvas id="game-engine-canvas"></canvas>
+    </div>
+
+
+    <script type="module">
+        import App from "./App.js"
+        import TestScene from "./Scenes/TestScene.js"
+        import GeometryScene from "./Scenes/GeometryScene.js"
+        window.addEventListener("load",function(){
+            App.launch();
+
+
+            App.addScene("TestScene", new GeometryScene());
+            App.runScene("TestScene");
+        });
+
+    </script>
+
+    <img src="Textures/TropicalSunnyDayBack2048.png" id="cube_back" style="display:none;">
+    <img src="Textures/TropicalSunnyDayFront2048.png" id="cube_front" style="display:none;">
+    <img src="Textures/TropicalSunnyDayDown2048.png" id="cube_bottom" style="display:none;">
+    <img src="Textures/TropicalSunnyDayLeft2048.png" id="cube_left" style="display:none;">
+    <img src="Textures/TropicalSunnyDayRight2048.png" id="cube_right" style="display:none;">
+    <img src="Textures/TropicalSunnyDayUp2048.png" id="cube_top" style="display:none;">
+
+    <img src="Textures/leather.jpg" id="leather" style="display:none;">
+    <img src="Textures/RedCarpet_S.jpg" id="carpet" style="display:none;">
+
+    <link rel="stylesheet" href="css/style.css" style="display:none;">
+</body>
+</html>
