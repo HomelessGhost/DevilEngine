@@ -20,6 +20,7 @@ class SurfaceStorage{
 			Core.mShaderProgs.set( "SplineDot",  shader);
 			Core.mShaderProgs.set( "PhongSurface",  pShader);
 			shader.prepareUniform("uProjView", "mat4");
+			shader.prepareUniform("color", "vec3");
 			pShader.prepareUniform("uProjView", "mat4");
 			pShader.prepareUniform("uTexture", "sampler2D");
 
@@ -40,7 +41,7 @@ class Surface{
 		this.sizeZ = sZ;
 		this.xBrokenLines = [];
 		this.zBrokenLines = [];
-		this.color        = [0,0,0];
+		this.color        = [0.0, 0.0, 1.0];
 		this.texture      = null;
 
 
@@ -122,7 +123,7 @@ class TwoCurveBase{
 		this.geometry = geometry;
 		this.refID = geometry._getRefID();
 
-		this.color        = [0,0,0];
+		this.color        = [0.0, 0.0, 1.0];
 		this.texture      = null;
 
 		this.c1points = geometry.createCurve(0);
@@ -191,7 +192,7 @@ class FourCurveBase{
 		this.geometry = geometry;
 		this.refID = geometry._getRefID();
 
-		this.color        = [0,0,0];
+		this.color        = [0.0, 0.0, 1.0];
 		this.texture      = null;
 
 
@@ -319,6 +320,7 @@ let surfaceDrawFunction = function(e){
 			case SurfaceSpline.GRID:
 				let shaderGrid = Core.mShaderProgs.get("SplineDot");
 				shaderGrid.bind();
+				shaderGrid.setUniform("color", storage.surfaces[i].color );
 				shaderGrid.setUniform("uProjView", Camera.getProjectionViewMatrix( Core.camera.com.Camera ) );
 				GL.ctx.bindVertexArray(storage.surfaces[i].spline.vao.vao.id);
 				GL.ctx.drawElements(GL.ctx.LINE_STRIP, storage.surfaces[i].spline.indices.length, GL.ctx.UNSIGNED_SHORT, 0);

@@ -49,7 +49,7 @@ class TestScene extends Scene{
 
  //      initSkybox(this.ECS);
 
- //     this.initGridFloor();
+        // this.initGridFloor();
      
 
         this.Geometry = new Geometry(this.ECS);
@@ -68,37 +68,36 @@ class TestScene extends Scene{
 
 
 
-        let elliptic = this.Geometry.createFourCurveBase(5, 1, -30, 0).disableBoundaryCurves();
-        elliptic.fixY();
-        elliptic.addSpline(50, 50, 7, 2).setColor("#b70138").disableBrokenLines();
+        // let elliptic = this.Geometry.createFourCurveBase(5, 1, -30, 0).disableBoundaryCurves();
+        // elliptic.fixY();
+        // elliptic.addSpline(50, 50, 7, 2).setColor("#b70138").disableBrokenLines();
 
 
-        // let coons = this.Geometry.createFourCurveBase(5, 1, 7, 0).disableBoundaryCurves();
-        // coons.fixY();
-        // coons.addSpline(50, 50, 4, 2).setColor("#b70138").disableBrokenLines();
+        let coons = this.Geometry.createFourCurveBase(5, 1, 0, 0).disableBoundaryCurves();
+        coons.addSpline(50, 50, 4, 2).setColor("#00a328").disableBrokenLines();
 
         // let laplace = this.Geometry.createFourCurveBase(5, 1, -10, 0).disableBoundaryCurves();
         // laplace.fixY();
         // laplace.addSpline(25,10, 6, 2).setColor("#b70138").disableBrokenLines();
 
-        let deformation = this.Geometry.createFourCurveBase(5, 1, 0, 0).disableBoundaryCurves();
-        deformation.fixY();
-        deformation.poisson_coeff = 0.3;
-        deformation.addSpline(50, 50, 10, 2).setColor("#b70138").disableBrokenLines();
+        // let deformation = this.Geometry.createFourCurveBase(5, 1, 0, 0).disableBoundaryCurves();
+        // deformation.fixY();
+        // deformation.poisson_coeff = 0.3;
+        // deformation.addSpline(50, 50, 10, 2).setColor("#b70138").disableBrokenLines();
 
-        let deformation1 = this.Geometry.createFourCurveBase(5, 1, -7, 0).disableBoundaryCurves();
-        deformation1.fixY();
-        deformation1.poisson_coeff = 0.9;
-        deformation1.addSpline(50, 50, 10, 2).setColor("#b70138").disableBrokenLines();
+        // let deformation1 = this.Geometry.createFourCurveBase(5, 1, -7, 0).disableBoundaryCurves();
+        // deformation1.fixY();
+        // deformation1.poisson_coeff = 0.9;
+        // deformation1.addSpline(50, 50, 10, 2).setColor("#b70138").disableBrokenLines();
 
-        let natural = this.Geometry.createCurve(10, 1, 15, 0);
-        natural.addSpline(200, 8, 2);
+        // let natural = this.Geometry.createCurve(10, 1, 15, 0);
+        // natural.addSpline(200, 8, 2);
 
-        let bicubic = this.Geometry.createSurface(7, 7, 0.5, 0.5 , 0, 15, (x,z)=> Math.sin(x)*Math.sin(z));
-        bicubic.addSpline(200, 200, 8, 2).setColor("#ffffff").disableBrokenLines();
+        // let bicubic = this.Geometry.createSurface(7, 7, 0.5, 0.5 , 0, 0, (x,z)=> Math.sin(x)*Math.sin(z));
+        // bicubic.addSpline(200, 200, 8, 2).setColor('#dd0b6d').disableBrokenLines();
 
-        let bicubic2 = this.Geometry.createSurface(7, 7, 0.5, 0.5 , 20, 15, (x,z)=> x*x/4 + z*z/4 );
-        bicubic2.addSpline(200, 200, 8, 2).setColor("#087026").disableBrokenLines().setTexture(tex);
+        // let bicubic2 = this.Geometry.createSurface(7, 7, 0.5, 0.5 , 20, 15, (x,z)=> x*x/4 + z*z/4 );
+        // bicubic2.addSpline(200, 200, 8, 2).setColor("#087026").disableBrokenLines().setTexture(tex);
     }
 
 
