@@ -301,6 +301,8 @@ class Vec3 extends Float32Array{
 			return out;
 		}
 
+		static angleCos(a, b) { return Vec3.dot(a,b)/(a.length()*b.length()); }
+
 		//Another Equation for Linear Interpolation : (1 - t) * v0 + t * v1;
 		//Todo, see if this one work better then whats there.
 		/*

@@ -13,16 +13,24 @@ class SurfaceStorage{
 		if(!Core.mShaderProgs.get("SplineDot")){
 			loadShaderResource('../../Shaders/stdVertex.vs', 'std_v');
         	loadShaderResource('../../Shaders/stdFragment.fs', 'std_f');
+
         	loadShaderResource('../../Shaders/phongSurface.vs', 'phongSurface_v');
         	loadShaderResource('../../Shaders/phongSurface.fs', 'phongSurface_f');
+
+        	loadShaderResource('../../Shaders/orthogonality.vs', 'orthogonality_v');
+        	loadShaderResource('../../Shaders/orthogonality.fs', 'orthogonality_f');
+
         	let shader = new Shader("SplineDotShader", Core.shadersSrc.get("std_v"), Core.shadersSrc.get("std_f"));
         	let pShader = new PhongShader("PhongShader", Core.shadersSrc.get("phongSurface_v"), Core.shadersSrc.get("phongSurface_f"));
+        	let oShader = new Shader("PhongShader", Core.shadersSrc.get("orthogonality_v"), Core.shadersSrc.get("orthogonality_f"));
 			Core.mShaderProgs.set( "SplineDot",  shader);
 			Core.mShaderProgs.set( "PhongSurface",  pShader);
+			Core.mShaderProgs.set( "OrthoSurface",  oShader);
 			shader.prepareUniform("uProjView", "mat4");
 			shader.prepareUniform("color", "vec3");
 			pShader.prepareUniform("uProjView", "mat4");
 			pShader.prepareUniform("uTexture", "sampler2D");
+			oShader.prepareUniform("uProjView", "mat4");
 
 		}
 		this.surfaces = [];
@@ -316,6 +324,13 @@ let surfaceDrawFunction = function(e){
 				shaderDot.setUniform("uProjView", Camera.getProjectionViewMatrix( Core.camera.com.Camera ) );
 				GL.ctx.bindVertexArray(storage.surfaces[i].spline.vao.vao.id);
 				GL.ctx.drawArrays(GL.ctx.POINTS, 0, storage.surfaces[i].spline.verts.length/3);
+				break;
+			case SurfaceSpline.ORTHO:
+				let shaderOrtho = Core.mShaderProgs.get("OrthoSurface");
+				shaderOrtho.bind();
+				shaderOrtho.setUniform("uProjView", Camera.getProjectionViewMatrix( Core.camera.com.Camera ) );
+				GL.ctx.bindVertexArray(storage.surfaces[i].spline.vao.vao.id);
+				GL.ctx.drawElements(GL.ctx.TRIANGLE_STRIP, storage.surfaces[i].spline.indices.length, GL.ctx.UNSIGNED_SHORT, 0);
 				break;
 			case SurfaceSpline.GRID:
 				let shaderGrid = Core.mShaderProgs.get("SplineDot");

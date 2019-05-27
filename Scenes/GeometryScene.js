@@ -73,12 +73,13 @@ class TestScene extends Scene{
         // elliptic.addSpline(50, 50, 7, 2).setColor("#b70138").disableBrokenLines();
 
 
-        let coons = this.Geometry.createFourCurveBase(5, 1, 0, 0).disableBoundaryCurves();
-        coons.addSpline(50, 50, 4, 2).setColor("#00a328").disableBrokenLines();
+        let coons = this.Geometry.createFourCurveBase(5, 1, 0, 10).disableBoundaryCurves();
+        coons.fixY();
+        coons.addSpline(50, 50, 4, 4).setColor("#00a328").disableBrokenLines();
 
-        // let laplace = this.Geometry.createFourCurveBase(5, 1, -10, 0).disableBoundaryCurves();
-        // laplace.fixY();
-        // laplace.addSpline(25,10, 6, 2).setColor("#b70138").disableBrokenLines();
+        let laplace = this.Geometry.createFourCurveBase(5, 1, 0, 0).disableBoundaryCurves();
+        laplace.fixY();
+        laplace.addSpline(25,25, 6, 4).setColor("#b70138").disableBrokenLines();
 
         // let deformation = this.Geometry.createFourCurveBase(5, 1, 0, 0).disableBoundaryCurves();
         // deformation.fixY();
