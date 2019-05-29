@@ -83,6 +83,27 @@ class Matrix{
 		}
 		return C;
 	}
+
+	static mult(A, B){
+		let m = A[0].length;
+		let n = B.length;
+		let h = A.length;
+		let k = B[0].length;
+		if(m !== n) console.error("Wrong matrix dimensions");
+		let C = new Array(h);
+		for(let i=0; i<h; i++) C[i] = new Array(k);
+
+		for(let i=0; i<h; i++){
+			for(let j=0; j<k; j++){
+				let c_ij = 0;
+				for(let k=0; k<n; k++){
+					c_ij += A[i][k]*B[k][j];
+				}
+				C[i][j] = c_ij;
+			}
+		}
+		return C;
+	}
 }
 
 export { Matrix };

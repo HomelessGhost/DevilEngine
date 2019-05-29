@@ -1,5 +1,6 @@
 import CurveBase from "./CurveBase.js";
-import Vec3 from "../../../maths/Vec3.js"
+import Vec3      from "../../../maths/Vec3.js";
+import Matrix    from "../../../maths/LinearAlgebra.js";
 
 class BSplineInterpolationCurve extends CurveBase{
 	constructor(pointAry, splinePointsCount, q){
@@ -11,8 +12,6 @@ class BSplineInterpolationCurve extends CurveBase{
 	build(){
 		let verts = [];
 		let n = this.pointAry.length-1;
-
-
 
 		if(!this.q) this.q = n+1;
 		if(!this.h) this.h = n; 
@@ -65,21 +64,19 @@ class BSplineInterpolationCurve extends CurveBase{
 
 		// SOLVING EQUATIONS
 		let invXmatr = null;
-		if(n===h) invXmatr = this.inverse(N);
+		if(n===h) invXmatr = Matrix.inverse(N);
 		else {				
 
-			let N_T = this.transform(N);
-			let m1 = this.mult(N_T, N);
-			let m1i = this.inverse(m1);
+			let N_T = Matrix.transpose(N);
+			let m1 = Matrix.mult(N_T, N);
+			let m1i = Matrix.inverse(m1);
 
-			invXmatr = this.mult(m1i, N_T);
-
-
+			invXmatr = Matrix.mult(m1i, N_T);
 		}
 
-		let x = new Array(h+1);
-		let y = new Array(h+1);
-		let z = new Array(h+1);
+		this.x = new Array(h+1);
+		this.y = new Array(h+1);
+		this.z = new Array(h+1);
 
 		for(let i=0; i <= h; i++){
 			let tmpX = 0, tmpY = 0, tmpZ = 0;
@@ -88,29 +85,10 @@ class BSplineInterpolationCurve extends CurveBase{
 				tmpY += invXmatr[i][j] * this.pointAry[j].position[1];
 				tmpZ += invXmatr[i][j] * this.pointAry[j].position[2];
 			}
-			x[i] = tmpX;
-			y[i] = tmpY;
-			z[i] = tmpZ;
-		}
-
-		let P = [];
-		for(let i=0; i<=h; i++) P.push(x[i], y[i], z[i]);
-
-		let B = new Array(h+1);
-		for(let i=0; i<=h; i++) B[i] = new Array(3);
-		for(let i=0; i<=h; i++){
-			B[i][0] = x[i];
-			B[i][1] = y[i];
-			B[i][2] = z[i];
-		}
-		let D = this.mult(N, B);
-		for(let i=0; i<=n; i++){
-			D[i][0] -= this.pointAry[i].position[0];
-			D[i][1] -= this.pointAry[i].position[1];
-			D[i][2] -= this.pointAry[i].position[2];
-		}
-
-		
+			this.x[i] = tmpX;
+			this.y[i] = tmpY;
+			this.z[i] = tmpZ;
+		}	
 
 		let step_t = (this.knots[h+1] - this.knots[p]) / (this.splinePointsCount-1);
 		for(let stpT=0; stpT < this.splinePointsCount; stpT++){
@@ -118,9 +96,9 @@ class BSplineInterpolationCurve extends CurveBase{
 			let N2 = this._N2(h, p, this.knots[p]+stpT*step_t);
 
 			for(let k=0; k<=h; k++){
-				r_x += x[k] * N2[k];
-				r_y += y[k] * N2[k];
-				r_z += z[k] * N2[k];	
+				r_x += this.x[k] * N2[k];
+				r_y += this.y[k] * N2[k];
+				r_z += this.z[k] * N2[k];	
 			}
 			verts.push(r_x, r_y, r_z);
 		}
@@ -147,78 +125,6 @@ class BSplineInterpolationCurve extends CurveBase{
 			
 		}
 		return N;
-	}
-
-	inverse(A){
-		let n = A.length;
-		let a = new Array(n);
-		for(let i=0; i<n;i++) a[i]=new Array(2*n);
-
-		for(let i=0;i<n;i++){
-			for(let j=0;j<n;j++){
-				a[i][j] = A[i][j];
-			}
-		}
-		for(let i=0;i<n;i++){
-			for(let j=n;j<2*n;j++){
-				if(i==j-n) a[i][j]=1;
-				else       a[i][j]=0;
-			}
-		}
-		for(let i=0;i<n;i++){
-			let t=a[i][i];
-			for(let j=i;j<2*n;j++)
-				a[i][j]=a[i][j]/t;
-			for(let j=0;j<n;j++){
-				if(i!=j){
-					t=a[j][i];
-					for(let k=0;k<2*n;k++)
-						a[j][k]=a[j][k]-t*a[i][k];
-				}
-			}
-		}
-		let inv = new Array(n);
-		for(let i=0; i<n;i++) inv[i]=new Array(n);
-		for(let i=0;i<n;i++){
-			for(let j=0;j<n;j++){
-				inv[i][j] = a[i][j+n];
-			}
-		}
-		return inv;
-	}
-
-	transform(A){
-		let n = A.length;
-		let m = A[0].length;
-		let A_T = new Array(m);
-		for(let i=0; i<m; i++) A_T[i] = new Array(n);
-		for(let i=0; i<m; i++){
-			for(let j=0; j<n; j++){
-				A_T[i][j] = A[j][i];
-			}
-		}
-		return A_T;
-	}
-
-	mult(A, B){
-		let m = A[0].length;
-		let n = B.length;
-		let h = A.length;
-		let k = B[0].length;
-		if(m !== n) console.error("Wrong matrix dimensions");
-		let C = new Array(h);
-		for(let i=0; i<h; i++) C[i] = new Array(k);
-
-		for(let i=0; i<h; i++){
-			for(let j=0; j<k; j++){
-				let c_ij = 0;
-				for(let k=0; k<n; k++){
-					c_ij += A[i][k]*B[k][j];
-				}
-				C[i][j] = c_ij;
-			}
-		}
-		return C;
 	}
 }
 

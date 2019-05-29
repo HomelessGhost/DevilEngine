@@ -8,6 +8,8 @@ import DebugObject      from "./DebugObject.js";
 
 import { BezierCurve }               from "./Curves/CurveBaseImport.js";
 import { BSplineCurve }              from "./Curves/CurveBaseImport.js";
+import { HermiteCurve }              from "./Curves/CurveBaseImport.js";
+import { NaturalCurve }              from "./Curves/CurveBaseImport.js";
 import { BSplineInterpolationCurve } from "./Curves/CurveBaseImport.js";
 
 class CurveSpline{
@@ -40,7 +42,7 @@ class CurveSpline{
 		this.q = null;
 		this.h = null;
 
-		this.debugPoints = new DebugObject(this.geometry, splinePointsCount * 2, "#000000");
+		this.debugObject = new DebugObject(this.geometry, splinePointsCount * 2, "#000000");
 
 		this.defineBaseType();
 
@@ -58,6 +60,14 @@ class CurveSpline{
 			case CurveSpline.B_SPLINE_INTERPOLATION:
 				this.curveBase = new BSplineInterpolationCurve(this.base.controlPoints, this.splinePointsCount, this.q);
 				break;
+			case CurveSpline.HERMITE:
+				this.curveBase = new HermiteCurve(this.base.controlPoints, this.splinePointsCount, this.debugObject);
+				this.drawBrokenLine = false;
+				break;
+			case CurveSpline.CurveSpline.NATURAL_SPLINE:
+				this.curveBase = new NaturalCurve(this.base.controlPoints, this.splinePointsCount);
+				break;
+
 		}
 
 	}
@@ -128,165 +138,6 @@ class CurveSpline{
 		/////////////////////////////////////////////////////////
 		}
 		
-
-		
-		/////////////////////////////////////////////////////////
-		if(this.buildMode === CurveSpline.B_SPLINE_APPROXIMATION){
-
-			let n = pointAry.length-1;
-
-			if(!this.q) this.q = n+1;
-			if(!this.h) this.h = n; 
-			let h = this.h;
-			let q = this.q;
-			let p = q-1;
-			let m = h+p+1;
-			
-			
-
-			if(h < p ||  h > n) console.error("Wrong parameters for B spline interpolation");
-
-			this.knots = new Array( m+1 );
-
-			let t = new Array(n+1);
-
-			// Uniformly spaced method
-			//	for(let i=0; i<=n; i++) t[i] = i/n;
-
-			//	Chord Length Method
-			let L = 0;
-			let L_k = new Array(n+1);
-			L_k[0] = 0;
-			for(let i=1; i<=n; i++){
-				let tmpLen = Vec3.sub(pointAry[i].position, pointAry[i-1].position).length();
-				L += tmpLen;
-				L_k[i] = L_k[i-1] + tmpLen;
-			}
-			for(let k=0; k<=n; k++) t[k] = L_k[k]/L;
-
-
-			// UNIFORM KNOT VECTOR DISTRIBUTION
-			for(let i=0; i<=p; i++)   this.knots[i]=0;
-			for(let j=1; j<=h-p; j++) this.knots[j+p]=j/(h-p+1);
-			for(let j=m-p; j<=m; j++) this.knots[j]=1;
-
-			// AVERAGE KNOT VECTOR DISTRIBUTION
-			// for(let i=0; i<=p; i++)  this.knots[i]=0;
-			// for(let j=1; j<=n-p; j++){
-			// 	let sum=0;
-			// 	for(let i=j; i<=j+p-1; i++) sum += t[i];
-			// 	this.knots[j+p]=sum/p;
-			// }
-			// for(let i=m-p; i<=m; i++) this.knots[i]=1;
-			
-
-			// BUILDING MATRIX
-			let N = new Array( n+1 );
-			for(let i=0; i<=n; i++) N[i] = this._N2(h, p, t[i]);
-			
-
-			// SOLVING EQUATIONS
-			let Qx = new Array(h+1);
-			let Qy = new Array(h+1);
-			let Qz = new Array(h+1);
-			let invXmatr = null;
-			if(n===h) invXmatr = this.inverse(N);
-			else {				
-
-				let N_new = Array(n-1);
-				for(let i=0; i<n-1; i++) N_new[i] = new Array(h-1);
-				for(let i=1; i<=n-1; i++){
-					for(let j=1; j<=h-1;j++) N_new[i-1][j-1] = N[i][j];
-				}
-				let N_T = this.transform(N_new);
-				let m1 = this.mult(N_T, N_new);			
-				invXmatr = this.inverse(m1);
-
-				let Qk_x = new Array(n+1);
-				let Qk_y = new Array(n+1);
-				let Qk_z = new Array(n+1);
-				for(let k=0; k<=n;k++){
-					Qk_x[k] = pointAry[k].position[0]-N[k][0]*pointAry[0].position[0]-N[k][h]*pointAry[n].position[0];
-					Qk_y[k] = pointAry[k].position[1]-N[k][0]*pointAry[0].position[1]-N[k][h]*pointAry[n].position[1];
-					Qk_z[k] = pointAry[k].position[2]-N[k][0]*pointAry[0].position[2]-N[k][h]*pointAry[n].position[2];
-				}
-
-				for(let i=1; i<=h-1; i++){
-					let sumX = 0, sumY = 0, sumZ = 0;
-					for(let k=1; k<=n-1; k++){
-						sumX += N[k][i]*Qk_x[k];
-						sumY += N[k][i]*Qk_y[k];
-						sumZ += N[k][i]*Qk_z[k];
-					}
-					Qx[i] = sumX;
-					Qy[i] = sumY;
-					Qz[i] = sumZ;
-				}
-			}
-			
-
-
-			let x = new Array(h+1);
-			let y = new Array(h+1);
-			let z = new Array(h+1);
-
-			if(n===h){
-				for(let i=0; i <= h; i++){
-					let tmpX = 0, tmpY = 0, tmpZ = 0;
-					for(let j=0; j <= n; j++){
-						tmpX += invXmatr[i][j] * pointAry[j].position[0];
-						tmpY += invXmatr[i][j] * pointAry[j].position[1];
-						tmpZ += invXmatr[i][j] * pointAry[j].position[2];
-					}
-					x[i] = tmpX;
-					y[i] = tmpY;
-					z[i] = tmpZ;
-				}
-			} else {
-				for(let i=1; i<=h-1; i++){
-					let tmpX = 0, tmpY = 0, tmpZ = 0;
-					for(let j=1; j <= h-1; j++){
-						tmpX += invXmatr[i-1][j-1] * Qx[j];
-						tmpY += invXmatr[i-1][j-1] * Qy[j];
-						tmpZ += invXmatr[i-1][j-1] * Qz[j];
-					}
-
-					x[i] = tmpX;
-					y[i] = tmpY;
-					z[i] = tmpZ;
-				}
-			}
-
-
-			let P = [];
-			P.push(pointAry[0].position[0],pointAry[0].position[1],pointAry[0].position[2]);
-			for(let i=1; i<=h-1; i++) P.push(x[i], y[i], z[i]);
-			P.push(pointAry[n].position[0],pointAry[n].position[1],pointAry[n].position[2]);
-
-			x[0] = pointAry[0].position[0];
-			y[0] = pointAry[0].position[1];
-			z[0] = pointAry[0].position[2];
-
-			x[h] = pointAry[n].position[0];
-			y[h] = pointAry[n].position[1];
-			z[h] = pointAry[n].position[2];
-
-	
-
-			let step_t = (this.knots[h+1] - this.knots[p]) / (this.splinePointsCount-1);
-			for(let stpT=0; stpT < this.splinePointsCount; stpT++){
-				let r_x = 0, r_y = 0, r_z = 0;
-				let N2 = this._N2(h, p, this.knots[p]+stpT*step_t);
-
-				for(let k=0; k<=h; k++){
-					r_x += x[k] * N2[k];
-					r_y += y[k] * N2[k];
-					r_z += z[k] * N2[k];	
-				}
-				this.verts.push(r_x, r_y, r_z);
-			}
-			if(this.debugPoints.visible) this.debugPoints.setDots(P);
-		}
 		
 		/////////////////////////////////////////////////////////
 		if(this.buildMode === CurveSpline.HERMITE){

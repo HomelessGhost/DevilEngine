@@ -29,7 +29,7 @@ class BSplineCurve extends CurveBase{
 				let c_k = new Array(n+1);
 				let full_sum = 0;
 				for(let i=1; i<=n; i++) {
-					c_k[i] = Vec3.sub(pointAry[i].position, pointAry[i-1].position).length();
+					c_k[i] = Vec3.sub(this.pointAry[i].position, this.pointAry[i-1].position).length();
 					full_sum += c_k[i];
 				}
 				for(let k=0; k<=n+q; k++){
