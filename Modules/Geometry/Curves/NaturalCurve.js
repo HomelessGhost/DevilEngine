@@ -1,4 +1,5 @@
-import CurveBase from "./CurveBase.js";
+import CurveBase     from "./CurveBase.js";
+import Vec3          from "../../../maths/Vec3.js";
 
 class NaturalCurve extends CurveBase{
 	constructor(pointAry, splinePointsCount){
@@ -69,7 +70,6 @@ class NaturalCurve extends CurveBase{
 		MiZ[N] = MiZ[N-1]+(h[N-1]/h[N-2])*(MiZ[N-1]-MiZ[N-2]);
 
 
-
 		let i = 0;
 		let step = tAry[N] / (this.splinePointsCount-1);
 
@@ -87,7 +87,7 @@ class NaturalCurve extends CurveBase{
 			let z = fi1*P[i].z+fi2*P[i+1].z+fi3*h[i]*h[i]*MiZ[i]/6+fi4*h[i]*h[i]*MiZ[i+1]/6;
 
 
-		 	verts.push(x, y, z);
+		 	verts.push( [x, y, z] );
 
 		 	if(stpT !==  this.splinePointsCount-1 && (stpT+1) * step > tAry[i+1]+0.000001){
 				i++;

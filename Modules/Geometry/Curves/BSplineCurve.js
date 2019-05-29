@@ -49,7 +49,7 @@ class BSplineCurve extends CurveBase{
 		let step_t = (this.knots[n+1] - this.knots[q-1]) / (this.splinePointsCount-1);
 		for(let stpT=0; stpT < this.splinePointsCount; stpT++){
 			let point = this.bspline_r2(this.knots[q-1] + stpT*step_t);
-			verts.push(point[0], point[1], point[2]);
+			verts.push( point );
 		}
 
 		return verts;

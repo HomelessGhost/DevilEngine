@@ -78,6 +78,7 @@ class DebugObject{
 		}
 		this.drawMode = GL.ctx.LINES;
 
+
 		GL.ctx.bindBuffer(GL.ctx.ARRAY_BUFFER, this.vao.vao["bVertices"].id);
 		GL.ctx.bufferSubData(GL.ctx.ARRAY_BUFFER, 0, new Float32Array(this.mVerts), 0, null);
 		GL.ctx.bindBuffer(GL.ctx.ARRAY_BUFFER,null);

@@ -12,7 +12,7 @@ class BezierCurve extends CurveBase{
 		let step_t   = 1 / (this.splinePointsCount-1);
 		for(let stpT=0; stpT < this.splinePointsCount; stpT++){
 			let point = this.bezier_r(stpT*step_t);
-			verts.push(point[0], point[1], point[2]);
+			verts.push( point );
 		}
 
 		return verts;

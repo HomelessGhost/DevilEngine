@@ -1,4 +1,5 @@
 import CurveBase from "./CurveBase.js";
+import Vec3      from "../../../maths/Vec3.js";
 
 class HermiteCurve extends CurveBase{
 	constructor(pointAry, splinePointsCount, tangentLines){
@@ -38,7 +39,7 @@ class HermiteCurve extends CurveBase{
 			let y = fi1*points[i*2].position[1] + fi2*points[(i+1)*2].position[1] + fi3*h_i*m_Ary[i][1] + fi4*h_i*m_Ary[i+1][1];
 			let z = fi1*points[i*2].position[2] + fi2*points[(i+1)*2].position[2] + fi3*h_i*m_Ary[i][2] + fi4*h_i*m_Ary[i+1][2];
 
-			verts.push(x, y, z);
+			verts.push( [x, y, z] );
 			if( stpT!==this.splinePointsCount-1 && (stpT+1)*step_t > t_Ary[i+1]+0.0001 ){
 				i++;
 			}

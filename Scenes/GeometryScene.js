@@ -25,6 +25,8 @@ import loadShaderResource from "../garbageFuncs.js";
 
 import Geometry           from "../Modules/Geometry/GeometryModule.js";
 
+import CurveSurfaceIntersection from "../Modules/Geometry/Intersections.js";
+
 
 
 class TestScene extends Scene{
@@ -73,11 +75,15 @@ class TestScene extends Scene{
         // elliptic.addSpline(50, 50, 7, 2).setColor("#b70138").disableBrokenLines();
 
         // let bezier = this.Geometry.createCurve(10, 1, 0, 0);
-        // bezier.addSpline(200, 5, 2);
+        // bezier.addSpline(200, 3, 2);
 
-        let coons = this.Geometry.createFourCurveBase(5, 1, 0, 10).disableBoundaryCurves();
-        coons.fixY();
-        coons.addSpline(50, 50, 4, 4).setColor("#00a328").disableBrokenLines();
+        // let coons = this.Geometry.createFourCurveBase(5, 1, 0, 0).disableBoundaryCurves();
+        // // coons.fixY();
+        // coons.addSpline(50, 50, 4, 2).setColor("#00a328").disableBrokenLines();
+
+        // let ruled = this.Geometry.createTwoCurveBase(5, 1, 0, 0).disableBoundaryCurves();
+        // // coons.fixY();
+        // ruled.addSpline(200, 200, 5, 2).setColor("#00a328").disableBrokenLines();
 
         // let laplace = this.Geometry.createFourCurveBase(5, 1, 0, 0).disableBoundaryCurves();
         // laplace.fixY();
@@ -93,11 +99,20 @@ class TestScene extends Scene{
         // deformation1.poisson_coeff = 0.9;
         // deformation1.addSpline(50, 50, 10, 2).setColor("#b70138").disableBrokenLines();
 
-        // let natural = this.Geometry.createCurve(10, 1, 15, 0);
-        // natural.addSpline(200, 8, 2);
+        let bicubic = this.Geometry.createSurface(7, 7, 0.5, 0.5 , 0, 0, (x,z)=> Math.sin(x)*Math.sin(z));
+        bicubic.addSpline(200, 200, 3, 2).setColor('#dd0b6d').disableBrokenLines();
 
-        // let bicubic = this.Geometry.createSurface(7, 7, 0.5, 0.5 , 0, 0, (x,z)=> Math.sin(x)*Math.sin(z));
-        // bicubic.addSpline(200, 200, 8, 2).setColor('#dd0b6d').disableBrokenLines();
+        let natural = this.Geometry.createCurve(6, 1, 0, 0, (x)=> x*x-3);
+        natural.addSpline(200, 5, 2);
+
+        let a = CurveSurfaceIntersection(natural.spline.curveBase, bicubic.spline.surfaceBase);
+        console.log(a);
+
+        for(let i = 0; i < a.length; i++){
+            this.Geometry.addPoint(a[i].x, a[i].y, a[i].z, "#0400fc");
+        }
+
+        
 
         // let bicubic2 = this.Geometry.createSurface(7, 7, 0.5, 0.5 , 20, 15, (x,z)=> x*x/4 + z*z/4 );
         // bicubic2.addSpline(200, 200, 8, 2).setColor("#087026").disableBrokenLines().setTexture(tex);

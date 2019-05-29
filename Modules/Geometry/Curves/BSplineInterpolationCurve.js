@@ -1,6 +1,6 @@
-import CurveBase from "./CurveBase.js";
-import Vec3      from "../../../maths/Vec3.js";
-import Matrix    from "../../../maths/LinearAlgebra.js";
+import CurveBase     from "./CurveBase.js";
+import Vec3          from "../../../maths/Vec3.js";
+import { Matrix }    from "../../../maths/LinearAlgebra.js";
 
 class BSplineInterpolationCurve extends CurveBase{
 	constructor(pointAry, splinePointsCount, q){
@@ -28,24 +28,26 @@ class BSplineInterpolationCurve extends CurveBase{
 		let t = new Array(n+1);
 
 		// Uniformly spaced method
-		// for(let i=0; i<=n; i++) t[i] = i/n;
+		for(let i=0; i<=n; i++) t[i] = i/n;
 
 	    // Chord Length Method
-		let L = 0;
-		let L_k = new Array(n+1);
-		L_k[0] = 0;
-		for(let i=1; i<=n; i++){
-			let tmpLen = Vec3.sub(this.pointAry[i].position, this.pointAry[i-1].position).length();
-			L += tmpLen;
-			L_k[i] = L_k[i-1] + tmpLen;
-		}
-		for(let k=0; k<=n; k++) t[k] = L_k[k]/L;
+		// let L = 0;
+		// let L_k = new Array(n+1);
+		// L_k[0] = 0;
+		// for(let i=1; i<=n; i++){
+		// 	let tmpLen = Vec3.sub(this.pointAry[i].position, this.pointAry[i-1].position).length();
+		// 	L += tmpLen;
+		// 	L_k[i] = L_k[i-1] + tmpLen;
+		// }
+		// for(let k=0; k<=n; k++) t[k] = L_k[k]/L;
+
 
 
 		// UNIFORM KNOT VECTOR DISTRIBUTION                 Работает всегда
 		for(let i=0; i<=p; i++)   this.knots[i]=0;
 		for(let j=1; j<=h-p; j++) this.knots[j+p]=j/(h-p+1);
 		for(let j=m-p; j<=m; j++) this.knots[j]=1;
+
 
 		// AVERAGE KNOT VECTOR DISTRIBUTION                 Этот метод некорректен, если h != n
 		// for(let i=0; i<=p; i++)  this.knots[i]=0;
@@ -88,9 +90,12 @@ class BSplineInterpolationCurve extends CurveBase{
 			this.x[i] = tmpX;
 			this.y[i] = tmpY;
 			this.z[i] = tmpZ;
-		}	
+		}
+
+
 
 		let step_t = (this.knots[h+1] - this.knots[p]) / (this.splinePointsCount-1);
+		this.tMax = step_t * (this.splinePointsCount-1);
 		for(let stpT=0; stpT < this.splinePointsCount; stpT++){
 			let r_x = 0, r_y = 0, r_z = 0;
 			let N2 = this._N2(h, p, this.knots[p]+stpT*step_t);
@@ -100,11 +105,28 @@ class BSplineInterpolationCurve extends CurveBase{
 				r_y += this.y[k] * N2[k];
 				r_z += this.z[k] * N2[k];	
 			}
-			verts.push(r_x, r_y, r_z);
+			verts.push( [r_x, r_y, r_z] );
 		}
 		
 		return verts;
 	}
+
+	getCoordDelegate(t){
+		t = t*this.tMax;
+		let h = this.h;
+		let q = this.q;
+		let p = q-1;
+		let r_x = 0, r_y = 0, r_z = 0;
+		let N2 = this._N2(h, p, this.knots[p]+t);
+
+		for(let k=0; k<=h; k++){
+			r_x += this.x[k] * N2[k];
+			r_y += this.y[k] * N2[k];
+			r_z += this.z[k] * N2[k];	
+		}
+		return [r_x, r_y, r_z];
+	}
+
 
 	_N2(n, p, u){
 		let U = this.knots;
