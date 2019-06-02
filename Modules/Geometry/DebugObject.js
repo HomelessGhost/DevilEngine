@@ -139,6 +139,7 @@ let debugObjectDrawFunction = function(e){
 
 	
 	for(let i=0; i<storage.debugObjects.length; i++){
+	//	console.log(storage.debugObjects[i].mVerts.length);
 		if(!storage.debugObjects[i].visible) continue;
 		if(storage.debugObjects[i].mVerts.length ===0) continue;
 		e.com.DebugObjectStorage.shader.setUniform("color", storage.debugObjects[i].color);

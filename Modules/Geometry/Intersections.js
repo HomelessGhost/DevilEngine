@@ -18,6 +18,7 @@ function CurveSurfaceIntersection(curveBase, surfaceBase){
 		for(let j = 1; j < map.tauAry[i].length-1; j++){
 			let v = map.tauAry[i][j];
 
+		//	console.log(u, v);
 			let s_surf = new Vec3(surfaceBase.getCoord(u, v));
 			let FD = surfaceBase.firstDerivative(u, v);
 			let s1 = new Vec3(FD.s1),
@@ -44,20 +45,28 @@ function CurveSurfaceIntersection(curveBase, surfaceBase){
 					g12 = Vec3.dot(s1, s2),
 					g22 = Vec3.dot(s2, s2);
 				let g = g11*g22 - g12*g12;
-				let G11 = g11/g,
-					G12 = g12/g,
-					G22 = g22/g;
+				let G11 = g22/g,
+					G12 = -g12/g,
+					G22 = g11/g;
 
-				let u0 = G11 * Vec3.dot( s1, Vec3.sub(ps, s0) )
-					   + G22 * Vec3.dot( s2, Vec3.sub(ps, s0) );
+				let subtr = Vec3.sub(ps, s0);
 
-				let v0 = G12 * Vec3.dot( s1, Vec3.sub(ps, s0) )
-					   + G22 * Vec3.dot( s2, Vec3.sub(ps, s0) );
+				let u0 = G11 * Vec3.dot( s1, subtr )
+					   + G12 * Vec3.dot( s2, subtr );
+
+				let v0 = G12 * Vec3.dot( s1, subtr )
+					   + G22 * Vec3.dot( s2, subtr );
 
 
 				let fortune = 0;
-				if( map.t[i-1] <= u0 && u0 <= map.t[i+1] )                 fortune++;
-				if( map.tauAry[i][j-1] <= v0 && v0 <= map.tauAry[i][j+1] ) fortune++;
+
+				let dU = (map.t[i+1] - map.t[i])/2,
+					dD = (map.t[i] - map.t[i-1])/2,
+					dL = (map.tauAry[i][j] - map.tauAry[i][j-1])/2,
+					dR = (map.tauAry[i][j+1] - map.tauAry[i][j])/2;
+
+				if( map.t[i] - dD <= u0 && u0 <= map.t[i] + dU )                 fortune++;
+				if( map.tauAry[i][j] - dL <= v0 && v0 <= map.tauAry[i][j] + dR ) fortune++;
 				if( curveMap[k-1] <= t0 && t0 <= curveMap[k+1] )           fortune++;
 
 				if(fortune === 3){

@@ -15,7 +15,7 @@ class CurveIterator{
 
 		let delta = this.alpha*fd.lengthSqr()/cross;
 		if(delta > 0.01) delta = 0.01;
-		if(delta < 0.001) delta = 0.001;
+		if(delta < 0.001) delta = 0.0001;
 		return delta;
 	}
 

@@ -77,9 +77,7 @@ class TestScene extends Scene{
         // let bezier = this.Geometry.createCurve(10, 1, 0, 0);
         // bezier.addSpline(200, 3, 2);
 
-        // let coons = this.Geometry.createFourCurveBase(5, 1, 0, 0).disableBoundaryCurves();
-        // // coons.fixY();
-        // coons.addSpline(50, 50, 4, 2).setColor("#00a328").disableBrokenLines();
+        
 
         // let ruled = this.Geometry.createTwoCurveBase(5, 1, 0, 0).disableBoundaryCurves();
         // // coons.fixY();
@@ -99,18 +97,37 @@ class TestScene extends Scene{
         // deformation1.poisson_coeff = 0.9;
         // deformation1.addSpline(50, 50, 10, 2).setColor("#b70138").disableBrokenLines();
 
-        let bicubic = this.Geometry.createSurface(7, 7, 0.5, 0.5 , 0, 0, (x,z)=> Math.sin(x)*Math.sin(z));
-        bicubic.addSpline(200, 200, 3, 2).setColor('#dd0b6d').disableBrokenLines();
+        let surface = this.Geometry.createSurface(7, 7, 0.5, 0.5 , 0, 0, (x,z)=> Math.sin(x)*Math.sin(z));
+        surface.addSpline(50, 50, 3, 2).setColor('#dd0b6d').disableBrokenLines();
 
-        let natural = this.Geometry.createCurve(6, 1, 0, 0, (x)=> x*x-3);
-        natural.addSpline(200, 5, 2);
+        // let surface = this.Geometry.createFourCurveBase(7, 1, 0, 0).disableBoundaryCurves();
+        // surface.addSpline(50, 50, 4, 2).setColor("#00a328").disableBrokenLines();
 
-        let a = CurveSurfaceIntersection(natural.spline.curveBase, bicubic.spline.surfaceBase);
+        let curve = this.Geometry.createCurve(10, 1, 0, 0, (x)=> 2*Math.sin(x));
+        curve.addSpline(200, 5, 2);
+
+        let curveBase   = curve.spline.curveBase;
+        let surfaceBase = surface.spline.surfaceBase;
+
+        let a = CurveSurfaceIntersection(curve.spline.curveBase, surface.spline.surfaceBase);
         console.log(a);
 
         for(let i = 0; i < a.length; i++){
             this.Geometry.addPoint(a[i].x, a[i].y, a[i].z, "#0400fc");
         }
+
+
+        // this.Geometry.addPoint(...surfaceBase.getCoord(0, 0), "#0400fc");
+        // this.Geometry.addPoint(...surfaceBase.getCoord(0.5, 0.5), "#0400fc");
+        // this.Geometry.addPoint(...surfaceBase.getCoord(1, 1), "#0400fc");
+        // this.Geometry.addPoint(...surfaceBase.getCoord(1, 0), "#0400fc");
+        // this.Geometry.addPoint(...surfaceBase.getCoord(0, 1), "#0400fc");
+        // this.Geometry.addPoint(...surfaceBase.getCoord(0.25, 0.25), "#0400fc");
+        // this.Geometry.addPoint(...surfaceBase.getCoord(0.75, 0.75), "#0400fc");
+
+        // this.Geometry.addPoint(...curveBase.getCoord(0), "#0400fc");
+        // this.Geometry.addPoint(...curveBase.getCoord(1), "#0400fc");
+        // this.Geometry.addPoint(...curveBase.getCoord(0.5), "#0400fc");
 
         
 

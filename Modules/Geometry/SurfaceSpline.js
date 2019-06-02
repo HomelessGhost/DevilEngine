@@ -40,7 +40,7 @@ class SurfaceSpline{
 		this.buildMode       = buildMode ?  buildMode : SurfaceSpline.UNIFORM;
 		this.drawMode        = drawMode ? drawMode : SurfaceSpline.GRID;
 		
-		this.drawNormals     = false;
+		this.drawNormals     = true;
 
 
 
@@ -56,8 +56,8 @@ class SurfaceSpline{
 			.finalize("SplinePoints");
 
 
-		this.normalObj = new DebugObject(this.geometry, splinePointsX * splinePointsZ, "#00FF00");
-		this.normalObj.visible = false;
+		this.normalObj = new DebugObject(this.geometry, splinePointsX * splinePointsZ, "#dd1cca");
+		this.normalObj.visible = true;
 
 		// this.surface.splineCallbacks.push(this.updateCallback.bind(this));
 		this.calculateUV();
@@ -100,9 +100,28 @@ class SurfaceSpline{
 	generate(){
 		this.verts = this.surfaceBase.build();
 
+		// let iterator = new SurfaceIterator(this.surfaceBase);
+		// let map = iterator.buildMap();
 
-		if(this.drawNormals) this.calculateNormalsX();
-		if(this.drawNormals) this.normalObj.setNormals(0.3, this.verts, this.normals);
+		// this.normVerts = [];
+		// for(let i = 0; i < map.t.length; i++){
+		// 	for(let j =0; j < map.tauAry[i].length; j++){
+		// 		let FD = this.surfaceBase.firstDerivative(map.t[i], map.tauAry[i][j]);
+		// 		let s1 = new Vec3(FD.s1),
+		// 			s2 = new Vec3(FD.s2);
+		// 		let n = Vec3.cross(s1, s2).normalize();
+
+			
+		// 		this.normVerts.push(...this.surfaceBase.getCoord(map.t[i], map.tauAry[i][j]));
+		// 		this.normals.push(...n); 
+		// 	}
+		// }
+		// console.log(this.normals);
+		// console.log(this.normVerts);
+
+
+		//if(this.drawNormals) this.calculateNormalsX();
+		//if(this.drawNormals) this.normalObj.setNormals(0.3, this.normVerts, this.normals);
 
 		return this;
 	}
