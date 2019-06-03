@@ -6,7 +6,7 @@ class BSplineInterpolationCurve extends CurveBase{
 	constructor(pointAry, splinePointsCount, q){
 		super(pointAry, splinePointsCount);
 
-		this.q = q;
+		this.q = 2;
 	}
 
 	build(){

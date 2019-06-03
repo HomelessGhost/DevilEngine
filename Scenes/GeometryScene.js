@@ -85,35 +85,36 @@ class TestScene extends Scene{
 
         // let laplace = this.Geometry.createFourCurveBase(5, 1, 0, 0).disableBoundaryCurves();
         // laplace.fixY();
-        // laplace.addSpline(25,25, 6, 4).setColor("#b70138").disableBrokenLines();
+        // laplace.addSpline(50,50, 6, 4).setColor("#22d319").disableBrokenLines();
 
-        let deformation = this.Geometry.createFourCurveBase(5, 1, 0, 0).disableBoundaryCurves();
-        deformation.fixY();
-        deformation.addSpline(50, 50, 10, 4).setColor("#22d319").disableBrokenLines();
-        deformation.spline.surfaceBase.deformationGridGenerator.changeCoeff(0.9);
+        // let deformation = this.Geometry.createFourCurveBase(5, 1, 0, 0).disableBoundaryCurves();
+        // deformation.fixY();
+        // deformation.addSpline(50, 50, 10, 4).setColor("#22d319").disableBrokenLines();
+        // deformation.spline.surfaceBase.deformationGridGenerator.changeCoeff(0.9);
 
-        let deformation1 = this.Geometry.createFourCurveBase(5, 1, 7, 0).disableBoundaryCurves();
-        deformation1.fixY();
-        deformation1.addSpline(50, 50, 10, 4).setColor("#22d319").disableBrokenLines();
-        deformation1.spline.surfaceBase.deformationGridGenerator.changeCoeff(0.1);
-        // let surface = this.Geometry.createSurface(7, 7, 0.5, 0.5 , 10, 0, (x,z)=> Math.sin(x)*Math.sin(z));
-        // surface.addSpline(50, 50, 3, 2).setColor('#b70138').disableBrokenLines();
+        // let deformation1 = this.Geometry.createFourCurveBase(5, 1, 7, 0).disableBoundaryCurves();
+        // deformation1.fixY();
+        // deformation1.addSpline(50, 50, 10, 4).setColor("#22d319").disableBrokenLines();
+        // deformation1.spline.surfaceBase.deformationGridGenerator.changeCoeff(0.1);
 
-        // let surface = this.Geometry.createFourCurveBase(7, 1, 0, 0).disableBoundaryCurves();
+        let surface = this.Geometry.createSurface(7, 7, 0.5, 0.5 , 0, 0, (x,z)=> Math.sin(x)*Math.sin(z));
+        surface.addSpline(50, 50, 3, 2).setColor('#b70138').disableBrokenLines();
+
+        // let surface = this.Geometry.createFourCurveBase(5, 1, 0, 0).disableBoundaryCurves();
         // surface.addSpline(50, 50, 4, 4).setColor('#22d319').disableBrokenLines();
 
-        // let curve = this.Geometry.createCurve(10, 1, 0, 0, (x)=> 2*Math.sin(x));
-        // curve.addSpline(200, 8, 2);
+        let curve = this.Geometry.createCurve(10, 1, 0, 0, (x)=> 2*Math.sin(x));
+        curve.addSpline(200, 3, 2);
 
-        // let curveBase   = curve.spline.curveBase;
-        // let surfaceBase = surface.spline.surfaceBase;
+        let curveBase   = curve.spline.curveBase;
+        let surfaceBase = surface.spline.surfaceBase;
 
-        // let a = CurveSurfaceIntersection(curve.spline.curveBase, surface.spline.surfaceBase);
-        // console.log(a);
+        let a = CurveSurfaceIntersection(curve.spline.curveBase, surface.spline.surfaceBase);
+        console.log(a);
 
-        // for(let i = 0; i < a.length; i++){
-        //     this.Geometry.addPoint(a[i].x, a[i].y, a[i].z, "#0400fc");
-        // }
+        for(let i = 0; i < a.length; i++){
+            this.Geometry.addPoint(a[i].x, a[i].y, a[i].z, "#0400fc");
+        }
 
 
         // this.Geometry.addPoint(...surfaceBase.getCoord(0, 0), "#0400fc");

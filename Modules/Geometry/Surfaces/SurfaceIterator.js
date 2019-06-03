@@ -22,7 +22,7 @@ class SurfaceIterator{
 
 		let delta = this.alpha*s1.length()/Math.abs(Vec3.dot(n, s11));
 
-		if(delta > 0.01) delta = 0.01;
+		if(delta > 0.1) delta = 0.1;
 		if(delta < 0.001) delta = 0.001;
 		return delta;
 	}
@@ -46,7 +46,7 @@ class SurfaceIterator{
 		let n = Vec3.cross(s1, s2).normalize();
 
 		let delta = this.alpha*s2.length()/Math.abs(Vec3.dot(n, s22));
-		if(delta > 0.01) delta = 0.01;
+		if(delta > 0.1) delta = 0.1;
 		if(delta < 0.001) delta = 0.001;
 		return delta;
 	}

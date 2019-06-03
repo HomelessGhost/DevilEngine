@@ -234,10 +234,10 @@ class FourCurveBase{
 
 		this.spline = null;
 
-		this.c1points.addSpline(50, 8,2);
-		this.c2points.addSpline(50, 8,2);
-		this.c3points.addSpline(50, 8,2);
-		this.c4points.addSpline(50, 8,2);
+		this.c1points.addSpline(50, 5,2);
+		this.c2points.addSpline(50, 5,2);
+		this.c3points.addSpline(50, 5,2);
+		this.c4points.addSpline(50, 5,2);
 
 		this.poisson_coeff = null;
 

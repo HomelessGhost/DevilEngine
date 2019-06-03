@@ -18,6 +18,8 @@ import { UniformSurface }            from "./Surfaces/SurfaceBaseImport.js";
 import { Bicubic4_4Surface }         from "./Surfaces/SurfaceBaseImport.js";
 import { Bicubic4_4_CSurface }       from "./Surfaces/SurfaceBaseImport.js";
 import { DeformationSurface }        from "./Surfaces/SurfaceBaseImport.js";
+import { LaplaceSurface }            from "./Surfaces/SurfaceBaseImport.js";
+
 
 import SurfaceIterator  from "./Surfaces/SurfaceIterator.js";
 
@@ -98,9 +100,10 @@ class SurfaceSpline{
 			case SurfaceSpline.BICUBIC4_4_C:
 				this.surfaceBase = new Bicubic4_4_CSurface(this.base.controlPoints, this.base.sizeX, this.base.sizeZ, this.splinePointsX, this.splinePointsZ);
 				break;
-			// case SurfaceSpline.DISTANCE:
-			// 	this.curveBase = new DistanceCurve(this.base.controlPoints, this.splinePointsCount);
-			// 	break;
+			case SurfaceSpline.LAPLACE:
+				this.surfaceBase = new LaplaceSurface(this.base.controlPoints, this.base.sizeX, this.base.sizeZ, this.splinePointsX, this.splinePointsZ, 
+					this.base.c1points, this.base.c2points, this.base.c3points, this.base.c4points);
+				break;
 		}
 
 	}

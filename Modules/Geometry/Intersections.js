@@ -18,7 +18,7 @@ function CurveSurfaceIntersection(curveBase, surfaceBase){
 		for(let j = 1; j < map.tauAry[i].length-1; j++){
 			let v = map.tauAry[i][j];
 
-		//	console.log(u, v);
+	
 			let s_surf = new Vec3(surfaceBase.getCoord(u, v));
 			let FD = surfaceBase.firstDerivative(u, v);
 			let s1 = new Vec3(FD.s1),
@@ -67,10 +67,33 @@ function CurveSurfaceIntersection(curveBase, surfaceBase){
 
 				if( map.t[i] - dD <= u0 && u0 <= map.t[i] + dU )                 fortune++;
 				if( map.tauAry[i][j] - dL <= v0 && v0 <= map.tauAry[i][j] + dR ) fortune++;
-				if( curveMap[k-1] <= t0 && t0 <= curveMap[k+1] )           fortune++;
+				if( curveMap[k-1] <= t0 && t0 <= curveMap[k+1] )                 fortune++;
 
 				if(fortune === 3){
-					foundPoints.push(s_surf);
+					
+
+					let eps = 0.0001;
+					let p = new Vec3(surfaceBase.getCoord(u0, v0));
+					let c = new Vec3(curveBase.getCoord(t0));
+					let t_old = 1000;
+					let t_k = t0;
+					while( Math.abs(t_k-t_old) > eps ){
+					//	console.log(Math.abs(t_k-t_old));
+						t_old = t_k;
+						let c_prime = new Vec3(curveBase.firstDerivative(t_k));
+						let c_dprime = new Vec3(curveBase.secondDerivative(t_k));
+						let diff_up = Vec3.sub(c, p);
+						let diff_down = Vec3.sub(p, c);
+
+
+						let stp = Vec3.dot(diff_up, c_prime) / ( Vec3.dot(diff_down, c_dprime) - Vec3.dot(c_prime, c_prime) );
+						
+						t_k = t_k + stp;
+						console.log(t_k);
+
+					}
+					foundPoints.push(new Vec3(curveBase.getCoord(t_k)));
+
 					break;
 				}
 

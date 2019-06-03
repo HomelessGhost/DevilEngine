@@ -115,7 +115,13 @@ class SurfaceBase{
 		            (vD[1] + vU[1] - 2*vV[1])/(h*h), 
 		            (vD[2] + vU[2] - 2*vV[2])/(h*h) ];
 
-		return { s11: s11, s22: s22 };
+		let vRD = this.getCoord(t+h, tau+h);
+
+		// let s12 = [ (vRD[0] - vD[0] - vR[0] + vH[0])/(h*h),
+		//             (vRD[1] - vD[1] - vR[1] + vH[1])/(h*h),
+		//             (vRD[2] - vD[2] - vR[2] + vH[2])/(h*h) ];
+
+		return { s11: s11, s22: s22, s12: s12 };
 	}
 
 	// Abstract method for building all spacial coordinates
