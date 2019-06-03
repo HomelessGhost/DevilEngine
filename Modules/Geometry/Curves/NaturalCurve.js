@@ -20,6 +20,11 @@ class NaturalCurve extends CurveBase{
 			tAry[i] = tAry[i-1] + distance;
 			h[i-1] = distance;
 		}
+
+		this.tAry = tAry;
+		this.h = h;
+		this.tMax = tAry[ tAry.length-1 ];
+
 		let a = new Array(N);
 		let b = new Array(N);
 		let c = new Array(N);
@@ -57,9 +62,15 @@ class NaturalCurve extends CurveBase{
 			dz[i] = 6*( (P[i+1].z-P[i].z)/h[i] - (P[i].z-P[i-1].z)/h[i-1]  );
 		}
 
-		let MiX = this.ThomasAlgorithm(a,b,c,dx,N);
-		let MiY = this.ThomasAlgorithm(a,b,c,dy,N);
-		let MiZ = this.ThomasAlgorithm(a,b,c,dz,N);
+		this.MiX = this.ThomasAlgorithm(a,b,c,dx,N);
+		this.MiY = this.ThomasAlgorithm(a,b,c,dy,N);
+		this.MiZ = this.ThomasAlgorithm(a,b,c,dz,N);
+
+
+		let MiX = this.MiX;
+		let MiY = this.MiY;
+		let MiZ = this.MiZ;
+
 		MiX[0] = MiX[1]-(h[0]/h[1])*(MiX[2]-MiX[1]);
 		MiX[N] = MiX[N-1]+(h[N-1]/h[N-2])*(MiX[N-1]-MiX[N-2]);
 
@@ -95,6 +106,28 @@ class NaturalCurve extends CurveBase{
 		}
 		return verts;
 	}
+
+	getCoordDelegate(t){
+		t = t*this.tMax;
+		let i = 0;
+		while(t > this.tAry[i] ) i++;
+		let ti = this.tAry[i-1];
+
+		let w = (t-ti)/this.h[i];
+
+		let fi1 = 1-w;
+		let fi2 = w;
+		let fi3 = w*(w-1)*(2-w);
+		let fi4 = w*(w*w-1);
+
+		let x = fi1*this.pointAry[i].position.x+fi2*this.pointAry[i+1].position.x+fi3*this.h[i]*this.h[i]*this.MiX[i]/6+fi4*this.h[i]*this.h[i]*this.MiX[i+1]/6;
+		let y = fi1*this.pointAry[i].position.y+fi2*this.pointAry[i+1].position.y+fi3*this.h[i]*this.h[i]*this.MiY[i]/6+fi4*this.h[i]*this.h[i]*this.MiY[i+1]/6;
+		let z = fi1*this.pointAry[i].position.z+fi2*this.pointAry[i+1].position.z+fi3*this.h[i]*this.h[i]*this.MiZ[i]/6+fi4*this.h[i]*this.h[i]*this.MiZ[i+1]/6;
+		
+		return [x, y, z];
+	}
+
+
 
 	ThomasAlgorithm(a, b, c, d, N){ 
 		let P = new Array(N);

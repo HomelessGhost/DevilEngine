@@ -17,6 +17,7 @@ import { RuledSurface }              from "./Surfaces/SurfaceBaseImport.js";
 import { UniformSurface }            from "./Surfaces/SurfaceBaseImport.js";
 import { Bicubic4_4Surface }         from "./Surfaces/SurfaceBaseImport.js";
 import { Bicubic4_4_CSurface }       from "./Surfaces/SurfaceBaseImport.js";
+import { DeformationSurface }        from "./Surfaces/SurfaceBaseImport.js";
 
 import SurfaceIterator  from "./Surfaces/SurfaceIterator.js";
 
@@ -29,9 +30,11 @@ class SurfaceSpline{
 		this.base     = base;
 
 		this.vao             = new VAO;
+		this.vaoGrid         = new VAO;
 		this.verts			 = [];
 		this.normals         = [];
 		this.colors          = [];
+		this.indicesGrid     = [];
 		this.indices         = [];
 		this.uv              = [];
 		this.bufSize		 = Float32Array.BYTES_PER_ELEMENT * 3 * splinePointsX * splinePointsZ; //3Floats per vert
@@ -43,9 +46,9 @@ class SurfaceSpline{
 		this.drawNormals     = true;
 
 
-
-		if(drawMode === SurfaceSpline.GRID) this.index();
-		else                   this.indexTriangleStrip();
+		this.index();
+		if(this.drawMode !== 2 ) this.indexTriangleStrip();
+		
 
 		this.vao.create()
 			.emptyFloatBuffer("bVertices",this.bufSize , Shader.ATTRIB_POSITION_LOC, 3, 0, 0, false)
@@ -54,6 +57,11 @@ class SurfaceSpline{
 			.emptyFloatBuffer("bColors",this.bufSize , Shader.ATTRIB_COLOR, 3, 0, 0, false)
 			.indexBuffer("index",this.indices,true,false)
 			.finalize("SplinePoints");
+
+		this.vaoGrid.create()
+			.emptyFloatBuffer("bVertices",this.bufSize , Shader.ATTRIB_POSITION_LOC, 3, 0, 0, false)
+			.indexBuffer("index",this.indicesGrid,true,false)
+			.finalize("Grid");
 
 
 		this.normalObj = new DebugObject(this.geometry, splinePointsX * splinePointsZ, "#dd1cca");
@@ -64,6 +72,8 @@ class SurfaceSpline{
 		this.defineBaseType();
 		this.update();
 	}
+
+
 
 	defineBaseType(){
 		switch(this.buildMode){
@@ -78,10 +88,10 @@ class SurfaceSpline{
 				this.surfaceBase = new RuledSurface(this.base.controlPoints, this.base.sizeX, this.base.sizeZ, this.splinePointsX, this.splinePointsZ, 
 					this.base.c1points, this.base.c2points);
 				break;
-			// case SurfaceSpline.HERMITE:
-			// 	this.curveBase = new HermiteCurve(this.base.controlPoints, this.splinePointsCount, this.debugObject);
-			// 	this.drawBrokenLine = false;
-			// 	break;
+			case SurfaceSpline.DEFORMATION:
+				this.surfaceBase = new DeformationSurface(this.base.controlPoints, this.base.sizeX, this.base.sizeZ, this.splinePointsX, this.splinePointsZ, 
+					this.base.c1points, this.base.c2points, this.base.c3points, this.base.c4points);
+				break;
 			case SurfaceSpline.BICUBIC4_4:
 				this.surfaceBase = new Bicubic4_4Surface(this.base.controlPoints, this.base.sizeX, this.base.sizeZ, this.splinePointsX, this.splinePointsZ);
 				break;
@@ -99,6 +109,8 @@ class SurfaceSpline{
 
 	generate(){
 		this.verts = this.surfaceBase.build();
+
+		this.calculateOrtho();
 
 		// let iterator = new SurfaceIterator(this.surfaceBase);
 		// let map = iterator.buildMap();
@@ -418,65 +430,6 @@ class SurfaceSpline{
 		////////////////////////////////////////////////////////////////////////////
 		}
 
-		if(this.buildMode === SurfaceSpline.DEFORMATION){
-		////////////////////////////////////////////////////////////////////////////
-			let step_t   = 1 / (this.splinePointsZ-1);
-			let step_tau = 1 / (this.splinePointsX-1);
-
-			let c1_Ary = this.base.c1points.spline.getEvaluatedArray(CurveSpline.B_SPLINE_INT, this.splinePointsZ);
-			let c2_Ary = this.base.c2points.spline.getEvaluatedArray(CurveSpline.B_SPLINE_INT, this.splinePointsZ);
-			let c3_Ary = this.base.c3points.spline.getEvaluatedArray(CurveSpline.B_SPLINE_INT, this.splinePointsX);
-			let c4_Ary = this.base.c4points.spline.getEvaluatedArray(CurveSpline.B_SPLINE_INT, this.splinePointsX);
-
-
-			let X = Matrix.createMatrix(this.splinePointsZ, this.splinePointsX);
-			let Z = Matrix.createMatrix(this.splinePointsZ, this.splinePointsX);
-
-			for(let i=0; i<this.splinePointsX; i++){
-				X[0][i] = c3_Ary[i][0];
-				Z[0][i] = c3_Ary[i][2];
-
-				X[this.splinePointsZ-1][i] = c4_Ary[i][0];
-				Z[this.splinePointsZ-1][i] = c4_Ary[i][2];
-			}
-			for(let i=1; i<this.splinePointsZ-1; i++){
-				X[i][0] = c1_Ary[i][0];
-				Z[i][0] = c1_Ary[i][2];
-
-				X[i][this.splinePointsX-1] = c2_Ary[i][0];
-				Z[i][this.splinePointsX-1] = c2_Ary[i][2];
-			}
-
-			for(let stpT=1; stpT<this.splinePointsZ-1; stpT++){
-				for(let stpTau=1; stpTau<this.splinePointsX-1; stpTau++){
-					let point = this._r(stpT*step_t, stpTau*step_tau, c1_Ary, c2_Ary, c3_Ary, c4_Ary, stpT, stpTau);
-					X[stpT][stpTau] = point[0];
-					Z[stpT][stpTau] = point[2];
-				}
-			}
-
-			if(!this.deformationGridGenerator){
-				this.deformationGridGenerator = new DeformationGridGenerator(X, Z, this.splinePointsZ, this.splinePointsX, this.base.poisson_coeff);
-			}
-			this.deformationGridGenerator.init(X,Z);
-			let solution = this.deformationGridGenerator.solve();
-			let solvedX = solution[0];
-			let solvedZ = solution[1];
-
-			for(let i=0; i<this.splinePointsZ; i++){
-				for(let j=0; j<this.splinePointsX; j++){
-					this.verts.push(solvedX[i][j], 1, solvedZ[i][j]);
-				}
-			}
-
-			if(this.drawMode !== SurfaceSpline.POINTS) this.calculateNormalsX();
-			if(this.drawNormals) this.normalObj.setNormals(0.3, this.verts, this.normals);
-
-			return this;
-
-		////////////////////////////////////////////////////////////////////////////
-		}
-		
 
 		else { 
 			console.log("SurfaceSpline error: given build mode does not exist. Try SurfaceSpline.UNIFORM or SurfaceSpline.DISTANCE");
@@ -505,6 +458,11 @@ class SurfaceSpline{
 		GL.ctx.bufferSubData(GL.ctx.ARRAY_BUFFER, 0, new Float32Array(this.verts), 0, null);
 		GL.ctx.bindBuffer(GL.ctx.ARRAY_BUFFER,null);
 
+		//
+		GL.ctx.bindBuffer(GL.ctx.ARRAY_BUFFER,this.vaoGrid.vao["bVertices"].id);
+		GL.ctx.bufferSubData(GL.ctx.ARRAY_BUFFER, 0, new Float32Array(this.verts), 0, null);
+		GL.ctx.bindBuffer(GL.ctx.ARRAY_BUFFER,null);
+
 		// Отправляем нормали в GPU
 		GL.ctx.bindBuffer(GL.ctx.ARRAY_BUFFER,this.vao.vao["bNormals"].id);
 		GL.ctx.bufferSubData(GL.ctx.ARRAY_BUFFER, 0, new Float32Array(this.normals), 0, null);
@@ -514,6 +472,7 @@ class SurfaceSpline{
 	}
 
 	index(){
+		this.indices = [];
 		for(let X = 0; X < this.splinePointsX; X++){
 			if( X%2 === 0 ) for(let Z = 0; Z < this.splinePointsZ; Z++)
 				this.indices.push( Z*this.splinePointsX + X );
@@ -540,10 +499,14 @@ class SurfaceSpline{
 			}				
 		}
 
+		for(let i = 0; i < this.indices.length; i++)
+			this.indicesGrid.push(this.indices[i]);
+
 		return this;
 	}
 
 	indexTriangleStrip(){
+		this.indices = [];
 		for(let Z=0; Z<this.splinePointsZ-1; Z++){
 			for(let X=0; X<this.splinePointsX; X++){
 				this.indices.push(Z*this.splinePointsX + X, (Z+1)*this.splinePointsX + X);

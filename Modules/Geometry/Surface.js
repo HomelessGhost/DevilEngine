@@ -234,10 +234,10 @@ class FourCurveBase{
 
 		this.spline = null;
 
-		this.c1points.addSpline(50, 5,2);
-		this.c2points.addSpline(50, 5,2);
-		this.c3points.addSpline(50, 5,2);
-		this.c4points.addSpline(50, 5,2);
+		this.c1points.addSpline(50, 8,2);
+		this.c2points.addSpline(50, 8,2);
+		this.c3points.addSpline(50, 8,2);
+		this.c4points.addSpline(50, 8,2);
 
 		this.poisson_coeff = null;
 
@@ -331,7 +331,15 @@ let surfaceDrawFunction = function(e){
 				shaderOrtho.setUniform("uProjView", Camera.getProjectionViewMatrix( Core.camera.com.Camera ) );
 				GL.ctx.bindVertexArray(storage.surfaces[i].spline.vao.vao.id);
 				GL.ctx.drawElements(GL.ctx.TRIANGLE_STRIP, storage.surfaces[i].spline.indices.length, GL.ctx.UNSIGNED_SHORT, 0);
+
+				let shaderGrid2 = Core.mShaderProgs.get("SplineDot");
+				shaderGrid2.bind();
+				shaderGrid2.setUniform("color", storage.surfaces[i].color );
+				shaderGrid2.setUniform("uProjView", Camera.getProjectionViewMatrix( Core.camera.com.Camera ) );
+				GL.ctx.bindVertexArray(storage.surfaces[i].spline.vaoGrid.vao.id);
+				GL.ctx.drawElements(GL.ctx.LINE_STRIP, storage.surfaces[i].spline.indices.length, GL.ctx.UNSIGNED_SHORT, 0);
 				break;
+
 			case SurfaceSpline.GRID:
 				let shaderGrid = Core.mShaderProgs.get("SplineDot");
 				shaderGrid.bind();

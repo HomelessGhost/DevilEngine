@@ -45,6 +45,11 @@ class DeformationGridGenerator{
 		}
 	}
 
+	changeCoeff(c){
+		this.poisson_coeff = c;
+		this.calculateCoeffs();
+	}
+
 	calculateCoeffs(){
 		let dx   = this.dx;
 		let dx2p = this.dx2p;
@@ -118,7 +123,6 @@ class DeformationGridGenerator{
 		}
 		let resX = Matrix.sum(this.iX, Ux);
 		let resY = Matrix.sum(this.iY, Uy);
-		console.log(counter);
 		return [Matrix.transpose(resX), Matrix.transpose(resY)];
 	}
 }
