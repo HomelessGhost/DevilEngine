@@ -14,7 +14,7 @@ class CurveIterator{
 		let cross = Vec3.cross(fd, sd).length();
 
 		let delta = this.alpha*fd.lengthSqr()/cross;
-		if(delta > 0.01) delta = 0.01;
+		if(delta > 0.1) delta = 0.1;
 		if(delta < 0.001) delta = 0.001;
 		return delta;
 	}

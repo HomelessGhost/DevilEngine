@@ -32,6 +32,8 @@ class Curve{
 
 		this.visible = true;
 
+		this.color =  [0.0, 0.0, 1.0];
+
 		this.controlPoints = [];
 		this.size = sX;
 		this.brokenLine = geometry.createBrokenLine();
@@ -60,6 +62,8 @@ class Curve{
 
 		CurveStorage.addToStorage(geometry.curveStorage, this);
 	}
+
+	setColor(cHex){ this.color = GL.rgbArray(cHex); return this; }
 
 	disableBrokenLine(){ this.brokenLine.visible = false; return this; }
 	enableBrokenLine(){  this.brokenLine.visible = true;  return this; }
@@ -94,6 +98,7 @@ let curveDrawFunction = function(e){
 	shader.setUniform("uProjView", Camera.getProjectionViewMatrix( Core.camera.com.Camera ) );
 	for(let i=0; i<storage.curves.length; i++){
 		if(!storage.curves[i].spline || !storage.curves[i].visible) continue;
+		shader.setUniform("color", storage.curves[i].color );
 		GL.ctx.bindVertexArray(storage.curves[i].spline.vao.vao.id);
 		switch(storage.curves[i].spline.drawMode){
 

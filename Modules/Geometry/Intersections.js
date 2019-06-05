@@ -73,26 +73,74 @@ function CurveSurfaceIntersection(curveBase, surfaceBase){
 					
 
 					let eps = 0.0001;
-					let p = new Vec3(surfaceBase.getCoord(u0, v0));
-					let c = new Vec3(curveBase.getCoord(t0));
+					
 					let t_old = 1000;
+					let u_old = 1000;
+					let v_old = 1000;
 					let t_k = t0;
-					while( Math.abs(t_k-t_old) > eps ){
-					//	console.log(Math.abs(t_k-t_old));
+					let u_k = u0;
+					let v_k = v0;
+
+					if(t_k > 1) t_k = 1;
+					if(t_k < 0) t_k = 0;
+					if(u_k > 1) u_k = 1;
+					if(u_k < 0) u_k = 0;
+					if(v_k > 1) v_k = 1;
+					if(v_k < 0) v_k = 0;
+
+					while( Math.abs(t_k-t_old) > eps || Math.abs(u_k-u_old) > eps || Math.abs(v_k-v_old) > eps ){
 						t_old = t_k;
+						u_old = u_k;
+						v_old = v_k;
+
+						let p1 = new Vec3(curveBase.getCoord(t_k));
+						let p = new Vec3(surfaceBase.getCoord(u_k, v_k));
+						let c = new Vec3(curveBase.getCoord(t_k));
+						let s = new Vec3(surfaceBase.getCoord(u_k, v_k));
+
+
 						let c_prime = new Vec3(curveBase.firstDerivative(t_k));
 						let c_dprime = new Vec3(curveBase.secondDerivative(t_k));
 						let diff_up = Vec3.sub(c, p);
 						let diff_down = Vec3.sub(p, c);
 
 
-						let stp = Vec3.dot(diff_up, c_prime) / ( Vec3.dot(diff_down, c_dprime) - Vec3.dot(c_prime, c_prime) );
+						let dt = Vec3.dot(diff_up, c_prime) / ( Vec3.dot(diff_down, c_dprime) - Vec3.dot(c_prime, c_prime) );
 						
-						t_k = t_k + stp;
-						console.log(t_k);
+						t_k = t_k + dt;
+
+						let FD = surfaceBase.firstDerivative(u_k, v_k);
+						let s1 = new Vec3(FD.s1),
+							s2 = new Vec3(FD.s2);
+
+						let SD = surfaceBase.secondDerivative(u_k, v_k);
+						let s11 = new Vec3(SD.s11),
+							s22 = new Vec3(SD.s22),
+							s12 = new Vec3(SD.s12);
+
+						let a11 = Vec3.dot(Vec3.sub(p1, s), s11) - Vec3.dot(s1, s1),
+							a12 = Vec3.dot(Vec3.sub(p1, s), s12) - Vec3.dot(s2, s1),
+							a21 = Vec3.dot(Vec3.sub(p1, s), s12) - Vec3.dot(s1, s2),
+							a22 = Vec3.dot(Vec3.sub(p1, s), s22) - Vec3.dot(s2, s2),
+							b1  = Vec3.dot(Vec3.sub(s, p1), s1),
+							b2  = Vec3.dot(Vec3.sub(s, p1), s2);
+						
+						let det = a11*a22 - a12*a21,
+							det_u = b1*a22 - b2*a12,
+							det_v = a11*b2 - a21*b1;
+
+						let dU = det_u/det;
+						let dV = det_v/det; 
+						
+						u_k = u_k + dU;
+						v_k = v_k + dV;
+
+						console.log(t_k - t_old, u_k - u_old, v_k - v_old);
+
 
 					}
-					foundPoints.push(new Vec3(curveBase.getCoord(t_k)));
+					
+					foundPoints.push(new Vec3(surfaceBase.getCoord(u_k, v_k)));
 
 					break;
 				}

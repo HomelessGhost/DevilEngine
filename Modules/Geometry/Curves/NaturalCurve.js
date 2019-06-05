@@ -110,7 +110,10 @@ class NaturalCurve extends CurveBase{
 	getCoordDelegate(t){
 		t = t*this.tMax;
 		let i = 0;
-		while(t > this.tAry[i] ) i++;
+		while(t > this.tAry[i] ){
+			i++;
+			//console.log(t, this.tAry[i]);
+		}
 		let ti = this.tAry[i-1];
 
 		let w = (t-ti)/this.h[i];

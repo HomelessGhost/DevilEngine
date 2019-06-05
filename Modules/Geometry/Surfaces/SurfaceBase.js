@@ -73,21 +73,25 @@ class SurfaceBase{
 		let h = this.fdStep;
 		let vL, vR, vH;
 		let vU, vD, vV;
+		let vRD_t, vRD_tau;
 		if(t < h){
 			vL = this.getCoord(0, tau);
 			vH = this.getCoord(h, tau);
 			vR = this.getCoord(2*h, tau);
+			vRD_t = 2*h;
 		}
 		else if(t > 1-h){
 			vL = this.getCoord(1-2*h, tau);
 			vH = this.getCoord(1-h, tau);
 			vR = this.getCoord(1, tau);
+			vRD_t = 1;
 		}
 
 		else{
 			vL = this.getCoord(t-h, tau);
 			vH = this.getCoord(t, tau);
 			vR = this.getCoord(t+h, tau);
+			vRD_t = t+h;
 		}
 
 		let s11 = [ (vR[0] + vL[0] - 2*vH[0])/(h*h),
@@ -98,28 +102,31 @@ class SurfaceBase{
 			vU = this.getCoord(t, 0);
 			vV = this.getCoord(t, h);
 			vD = this.getCoord(t, 2*h);
+			vRD_tau = 2*h;
 		}
 		else if(tau > 1-h){
 			vU = this.getCoord(t, 1-2*h);
 			vV = this.getCoord(t, 1-h);
 			vD = this.getCoord(t, 1);
+			vRD_tau = 1;
 		}
 
 		else{
 			vU = this.getCoord(t, tau-h);
 			vV = this.getCoord(t, tau);
 			vD = this.getCoord(t, tau+h);
+			vRD_tau = tau+h;
 		}
 
 		let s22 = [ (vD[0] + vU[0] - 2*vV[0])/(h*h),
 		            (vD[1] + vU[1] - 2*vV[1])/(h*h), 
 		            (vD[2] + vU[2] - 2*vV[2])/(h*h) ];
 
-		let vRD = this.getCoord(t+h, tau+h);
+		let vRD = this.getCoord(vRD_t, vRD_tau);
 
-		// let s12 = [ (vRD[0] - vD[0] - vR[0] + vH[0])/(h*h),
-		//             (vRD[1] - vD[1] - vR[1] + vH[1])/(h*h),
-		//             (vRD[2] - vD[2] - vR[2] + vH[2])/(h*h) ];
+		let s12 = [ (vRD[0] - vD[0] - vR[0] + vH[0])/(h*h),
+		            (vRD[1] - vD[1] - vR[1] + vH[1])/(h*h),
+		            (vRD[2] - vD[2] - vR[2] + vH[2])/(h*h) ];
 
 		return { s11: s11, s22: s22, s12: s12 };
 	}

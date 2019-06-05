@@ -87,6 +87,10 @@ class TestScene extends Scene{
         // laplace.fixY();
         // laplace.addSpline(50,50, 6, 4).setColor("#22d319").disableBrokenLines();
 
+        // let coons = this.Geometry.createFourCurveBase(5, 1, 7, 0).disableBoundaryCurves();
+        // coons.fixY();
+        // coons.addSpline(50, 50, 4, 4).setColor('#22d319').disableBrokenLines();
+
         // let deformation = this.Geometry.createFourCurveBase(5, 1, 0, 0).disableBoundaryCurves();
         // deformation.fixY();
         // deformation.addSpline(50, 50, 10, 4).setColor("#22d319").disableBrokenLines();
@@ -97,13 +101,15 @@ class TestScene extends Scene{
         // deformation1.addSpline(50, 50, 10, 4).setColor("#22d319").disableBrokenLines();
         // deformation1.spline.surfaceBase.deformationGridGenerator.changeCoeff(0.1);
 
-        let surface = this.Geometry.createSurface(7, 7, 0.5, 0.5 , 0, 0, (x,z)=> Math.sin(x)*Math.sin(z));
-        surface.addSpline(50, 50, 3, 2).setColor('#b70138').disableBrokenLines();
+        // let surface = this.Geometry.createSurface(7, 7, 0.5, 0.5 , 0, 0, (x,z)=> Math.sin(x)*Math.sin(z));
+        // surface.addSpline(50, 50, 3, 2).setColor('#b70138').disableBrokenLines();
 
-        // let surface = this.Geometry.createFourCurveBase(5, 1, 0, 0).disableBoundaryCurves();
-        // surface.addSpline(50, 50, 4, 4).setColor('#22d319').disableBrokenLines();
+        let surface = this.Geometry.createFourCurveBase(8, 1, 0, 0).disableBoundaryCurves();
+        surface.addSpline(50, 50, 4, 2).setColor('#22d319').disableBrokenLines();
 
-        let curve = this.Geometry.createCurve(10, 1, 0, 0, (x)=> 2*Math.sin(x));
+    
+
+        let curve = this.Geometry.createCurve(10, 1, -0.5, -1, (x)=> 4*Math.cos(1.5*x)+1).disableBrokenLine();
         curve.addSpline(200, 3, 2);
 
         let curveBase   = curve.spline.curveBase;
